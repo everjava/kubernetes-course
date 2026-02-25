@@ -1,0 +1,24 @@
+
+minikube dashboard
+minikube start --driver=docker
+minikube status
+minikube service spring-demo-service --url
+minikube service grade-submission-portal -n grade-submission --url
+
+# delete all pods from a namespace
+kubectl delete pods --all -n grade-submission 
+
+# List all namespaces
+kubectl get namespaces
+
+# Create a namespace
+kubectl create namespace production
+
+
+
+
+
+
+
+
+
