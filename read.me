@@ -1,3 +1,76 @@
+### Update minikube
+# (https://chat.deepseek.com/a/chat/s/f1616d1b-65be-46bc-abf7-cd45b9ced1ec)
+# Check available versions
+minikube update-check
+
+# Delete current cluster
+minikube delete
+
+# Start new cluster with a newer version (e.g., v1.28)
+minikube start --kubernetes-version=v1.28.0
+
+# Or just start with latest stable
+minikube start
+
+### Metric server
+
+# Check if metrics-server is running
+kubectl get pods -n kube-system | grep metrics-server
+
+# If not installed, enable it in minikube
+minikube addons enable metrics-server
+
+# Or install manually
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Check HPA status
+kubectl get hpa -n grade-submission
+
+# Describe HPA for detailed info
+kubectl describe hpa grade-submission-portal-hpa -n grade-submission
+
+# Check if metrics are being collected
+kubectl top pods -n grade-submission
+
+# Run a LOAD test pod
+kubectl run -it --rm load-generator --image=busybox --restart=Never -- /bin/sh -c "while true; do wget -q -O- http://grade-submission-portal.grade-submission.svc.cluster.local; done"
+
+## top pods erro ( kubectl.exe top pods -n grade-submission)
+# Edit the metrics-server deployment
+kubectl edit deployment metrics-server -n kube-system
+spec:
+  template:
+    spec:
+      containers:
+      - args:
+        - --cert-dir=/tmp
+        - --secure-port=10250
+        - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+        - --kubelet-use-node-status-port # copiar essa linha e editar com insecure-tls
+        - --metric-resolution=15s
+        - --kubelet-insecure-tls  # ADD THIS LINE (nao usar tab)
+
+# Restart the deployment
+kubectl rollout restart deployment metrics-server -n kube-system
+
+# Wait for the new pod to be ready
+kubectl wait --for=condition=ready pod -l k8s-app=metrics-server -n kube-system --timeout=60s
+
+# Check if the metrics API is registered and available
+kubectl get apiservice v1beta1.metrics.k8s.io -o wide
+
+# View logs to see the actual error
+kubectl logs -n kube-system -l k8s-app=metrics-server --container=metrics-server
+
+```
+x509: certificate signed by unknown authority → indicates TLS issue (fixed by --kubelet-insecure-tls)
+
+dial tcp: lookup <node-name> → DNS resolution issue (add --kubelet-preferred-address-types=InternalIP)
+
+context deadline exceeded or timeout → network connectivity issue
+```
+
+### Comandos
 
 minikube dashboard
 minikube start --driver=docker
