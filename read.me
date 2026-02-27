@@ -90,6 +90,62 @@ kubectl create namespace production
 ### Ingress
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
 
+##s11 helm 
+#exibe os valores injetados nos arquivos template
+helm template .
+
+#empacota os arquivos de acordo com a versao do Chart
+helm package .
+
+#executa os arquivos(kubectl apply -f)
+helm install grade-submission-api grade-submission-api-1.0.1.tg -n grade-submission
+
+#desinstala ultima execucao
+helm uninstall grade-submission-api
+
+
+#rollback para versao anterior (1) = revision
+helm rollback grade-submission-api 1 -n grade-submission
+
+λ helm list -A
+NAME                    NAMESPACE               REVISION                                                  
+                        APP VERSION
+grade-submission-api    grade-submission        2               
+
+grade-submission-portal grade-submission        1
+
+-helm rollback grade-submission-api 1 -n grade-submission
+-helm list -A
+
+NAME                    NAMESPACE               REVISION                                         STATUS          CHART
+                        APP VERSION
+grade-submission-api    grade-submission        3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
